@@ -1,8 +1,9 @@
-# Focus （Codex灵动岛）
+# Focus
 
-一个为 Windows 设计的桌面灵动岛，把待办、专注倒计时、Codex 工作状态、每日笔记和常用提醒放在屏幕顶部。
+一个面向 Windows 与 macOS 的桌面灵动岛，把待办、专注倒计时、Codex 工作状态、每日笔记和常用提醒放在屏幕顶部。
 
-当前版本：`0.2.3`
+当前开发版本：`0.3.0-alpha.1`（Windows + macOS Apple Silicon）
+最新 Windows 稳定版：`0.2.3`
 
 ## 主要功能
 
@@ -45,19 +46,21 @@ Focus_0.2.3_x64-setup.exe
 
 安装包目前没有商业代码签名；如果 Windows SmartScreen 提示未知发布者，请先确认文件来自本仓库，再选择“更多信息”继续运行。
 
+macOS Apple Silicon Alpha 可通过仓库的 **Build macOS Alpha** GitHub Actions 工作流构建。当前产物未签名，详细说明见 [`docs/macos-alpha.md`](docs/macos-alpha.md)。
+
 ## 从源码运行
 
 二次开发或自行构建需要：
 
-- Windows 10 / Windows 11
+- Windows 10 / Windows 11，或 macOS 11+
 - Node.js 20+ 与 npm
 - Rust 与 Cargo
 - Visual Studio Build Tools（Desktop development with C++）
 - Microsoft Edge WebView2 Runtime
 
 ```powershell
-git clone https://github.com/你的用户名/Focus.git
-cd Focus
+git clone https://github.com/sslove1988/Codex-active-island.git
+cd Codex-active-island
 npm install
 npm run tauri -- dev
 ```
@@ -70,7 +73,7 @@ cd src-tauri
 cargo check
 ```
 
-生成 Windows 安装包：
+生成当前平台安装包：
 
 ```powershell
 npm run tauri -- build --bundles nsis
@@ -96,7 +99,7 @@ npm run tauri -- build --bundles nsis
 
 ## 已知限制
 
-- 当前仅正式支持 Windows。
+- Windows 为当前稳定平台，macOS Apple Silicon 仍处于 Alpha 阶段。
 - 暂无应用内自动更新，需要从 Releases 手动安装新版。
 - Codex 本地事件格式变化时，状态联动可能需要重新适配。
 - 安装包尚未使用商业代码签名证书。
