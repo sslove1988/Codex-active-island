@@ -1,0 +1,62 @@
+name: Build macOS Alpha
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - "v*-macos-alpha*"
+
+jobs:
+  build-apple-silicon:
+    runs-on: macos-14
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Test frontend build
+        run: npm run build
+
+      - name: Test Rust backend on macOS
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Build Apple Silicon app and DMG
+        run: npm run tauri -- build --target aarch64-apple-darwin --bundles app,dmg
+
+      - name: Validate app metadata and DMG
+        shell: bash
+        run: |
+          APP_PATH="$(find src-tauri/target/aarch64-apple-darwin/release/bundle/macos -maxdepth 1 -name '*.app' -print -quit)"
+          DMG_PATH="$(find src-tauri/target/aarch64-apple-darwin/release/bundle/dmg -maxdepth 1 -name '*.dmg' -print -quit)"
+          test -n "$APP_PATH"
+          test -n "$DMG_PATH"
+          plutil -lint "$APP_PATH/Contents/Info.plist"
+          hdiutil verify "$DMG_PATH"
+
+      - name: Upload unsigned macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Focus-0.3.0-alpha.1-macos-aarch64-unsigned
+          path: |
+            src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+            src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
+          if-no-files-found: error
