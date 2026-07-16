@@ -50,12 +50,14 @@ jobs:
           test -n "$APP_PATH"
           test -n "$DMG_PATH"
           plutil -lint "$APP_PATH/Contents/Info.plist"
+          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+          codesign -dv --verbose=4 "$APP_PATH" 2>&1 | grep -q "Signature=adhoc"
           hdiutil verify "$DMG_PATH"
 
-      - name: Upload unsigned macOS artifacts
+      - name: Upload ad-hoc-signed macOS artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Focus-0.3.0-alpha.1-macos-aarch64-unsigned
+          name: Focus-0.3.0-alpha.2-macos-aarch64-ad-hoc-signed
           path: |
             src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
             src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
